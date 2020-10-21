@@ -38,6 +38,8 @@ class Directory(
   override def asDirectory: Directory = this
 
   override def getType: String = "Directory"
+
+  override def asFile: File = throw new FileSystemException("A directory cannot be converted to file")
 }
 
 object Directory {
