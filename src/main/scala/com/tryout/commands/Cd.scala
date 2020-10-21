@@ -1,5 +1,4 @@
 package com.tryout.commands
-import java.nio.file.Path
 
 import com.tryout.files.{DirEntry, Directory}
 import com.tryout.filesystem.State
@@ -19,8 +18,22 @@ class Cd(dir: String) extends Command {
         else findEntryHelper(nextDir.asDirectory, path.tail)
       }
     }
+
+    @tailrec
+    def collapseRelativeTokens(path: List[String], result: List[String]): List[String] = {
+      if (path.isEmpty) result
+      else if (".".equals(path.head)) collapseRelativeTokens(path.tail, result)
+      else if ("..".equals(path.head)) {
+        if (result.isEmpty) null
+        else collapseRelativeTokens(path.tail, result.init)
+      }
+      else collapseRelativeTokens(path.tail, result :+ path.head)
+    }
+
     val tokens: List[String] = path.substring(1).split(Directory.SEPARATOR).toList
-    findEntryHelper(root, tokens)
+    val newTokens = collapseRelativeTokens(tokens, List())
+    if (newTokens == null) null
+    else findEntryHelper(root, newTokens)
   }
 
   override def apply(state: State): State = {
