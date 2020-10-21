@@ -9,8 +9,13 @@ class Directory(
                )
   extends DirEntry(parentPath, name) {
 
+  val isRoot: Boolean = parentPath.isEmpty
+
   def replaceEntry(entryName: String, newEntry: DirEntry): Directory =
     new Directory(parentPath, name, contents.filter(e => e.name != entryName) :+ newEntry)
+
+  override def isDirectory: Boolean = true
+  override def isFile: Boolean = false
 
   def findEntry(entryName: String): DirEntry = {
     @tailrec
